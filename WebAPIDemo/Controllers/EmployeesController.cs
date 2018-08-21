@@ -11,11 +11,22 @@ namespace WebAPIDemo.Controllers
 {
     public class EmployeesController : ApiController
     {
-        public IEnumerable<Employee> Get()
+        public HttpResponseMessage Get(string gender = "all")
         {
             using(WebAPIDemoEntities entity = new WebAPIDemoEntities())
             {
-                return entity.Employee.ToList();
+                switch (gender)
+                {
+                    case "all":
+                        return Request.CreateResponse(HttpStatusCode.OK, entity.Employee.ToList());
+                    case "male":
+                        return Request.CreateResponse(HttpStatusCode.OK, entity.Employee.Where(e => e.Gender.ToLower()=="male").ToList());
+                    case "female":
+                        return Request.CreateResponse(HttpStatusCode.OK, entity.Employee.Where(e => e.Gender.ToLower() == "female").ToList());
+                    default:
+                        return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Value of genger must be All, Male, Female " + gender + " is invalid.");
+
+                }
             }
         }
         public HttpResponseMessage Get(int id)
